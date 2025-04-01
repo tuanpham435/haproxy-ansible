@@ -8,7 +8,7 @@
   changed_when: false
 
 - name: Mở port firewall cho HAProxy (FirewallD)
-  firewalld:
+  ansible.posix.firewalld:
     port: "{{ item }}/tcp"
     permanent: yes
     state: enabled
