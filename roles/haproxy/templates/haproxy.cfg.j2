@@ -30,14 +30,14 @@ listen api-server-6443
   option  log-health-checks
   balance roundrobin
 {% for node in control_plane_nodes %}
-  server {{ node.name }} {{ node.hostname }}:6443 weight 1 verify none check check-ssl inter {{ haproxy_api_check_interval }} fall 2 rise 3{% if node.backup %} backup{% endif %}
+  server {{ node.name }} {{ node.hostname }}:6443 weight 1 verify none check check-ssl inter {{ haproxy_api_check_interval }} fall 2 rise 3{% if node.backup %} backup{% endif %}{{ '\n' }}
 {% endfor %}
 
 listen machine-config-server-22623
   bind {{ haproxy_bind_api_address }}:22623
   mode tcp
 {% for node in control_plane_nodes %}
-  server {{ node.name }} {{ node.hostname }}:22623 check inter {{ haproxy_machine_config_check_interval }}{% if node.backup %} backup{% endif %}
+  server {{ node.name }} {{ node.hostname }}:22623 check inter {{ haproxy_machine_config_check_interval }}{% if node.backup %} backup{% endif %}{{ '\n' }}
 {% endfor %}
 
 listen ingress-router-443
@@ -45,7 +45,7 @@ listen ingress-router-443
   mode tcp
   balance source
 {% for node in compute_nodes %}
-  server {{ node.name }} {{ node.hostname }}:443 check inter {{ haproxy_ingress_check_interval }}
+  server {{ node.name }} {{ node.hostname }}:443 check inter {{ haproxy_ingress_check_interval }}{{ '\n' }}
 {% endfor %}
 
 listen ingress-router-80
@@ -53,7 +53,7 @@ listen ingress-router-80
   mode tcp
   balance source
 {% for node in compute_nodes %}
-  server {{ node.name }} {{ node.hostname }}:80 check inter {{ haproxy_ingress_check_interval }}
+  server {{ node.name }} {{ node.hostname }}:80 check inter {{ haproxy_ingress_check_interval }}{{ '\n' }}
 {% endfor %}
 
 {% if enable_stats is defined and enable_stats %}
