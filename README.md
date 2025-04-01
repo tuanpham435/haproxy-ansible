@@ -80,7 +80,7 @@ mkdir -p haproxy-ansible/{inventory,group_vars,roles/haproxy/{defaults,handlers,
 
 ### 2. Tùy chỉnh inventory
 
-Chỉnh sửa file `inventory/hosts.ini` để cấu hình máy chủ HAProxy:
+Chỉnh sửa file `inventory` để cấu hình máy chủ HAProxy:
 
 ```ini
 [haproxy_servers]

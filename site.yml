@@ -1,0 +1,8 @@
+---
+# site.yml - Playbook chính triển khai HAProxy
+- name: Triển khai HAProxy cho OpenShift
+  hosts: haproxy_servers
+  become: true
+  
+  roles:
+    - haproxy
