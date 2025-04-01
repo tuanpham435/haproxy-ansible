@@ -1,0 +1,71 @@
+---
+# defaults/main.yml - Các biến mặc định cho role haproxy
+
+# Các biến cấu hình HAProxy (ít thay đổi)
+# -----------------------------------
+# Cấu hình Syslog
+haproxy_syslog_facility: local2
+
+# Trang thống kê
+enable_stats: false
+stats_port: 9000
+
+# Cấu hình HAProxy
+haproxy_max_connections: 4000
+haproxy_timeout_connect: 10s
+haproxy_timeout_client: 1m
+haproxy_timeout_server: 1m
+haproxy_timeout_queue: 1m
+haproxy_timeout_http_request: 10s
+haproxy_timeout_http_keep_alive: 10s
+haproxy_timeout_check: 10s
+
+# Cấu hình check interval
+haproxy_api_check_interval: 10s
+haproxy_machine_config_check_interval: 1s
+haproxy_ingress_check_interval: 1s
+
+# Cấu hình log rotation
+haproxy_log_rotation_interval: daily
+haproxy_log_rotate_count: 14
+
+# Cấu hình firewall
+haproxy_manage_firewall: true
+haproxy_firewall_ports:
+  - 6443
+  - 22623
+  - 80
+  - 443
+
+# Các biến PHẢI được định nghĩa trong group_vars hoặc host_vars
+# (Không nên sử dụng giá trị mặc định)
+# --------------------------------------------------------------
+# Địa chỉ IP cho API và Machine Config Server
+haproxy_bind_api_address: ""
+
+# Địa chỉ IP cho Ingress Router
+haproxy_bind_ingress_address: ""
+
+# Danh sách các node Control Plane
+control_plane_nodes: []
+# Ví dụ mẫu (hãy ghi đè trong group_vars hoặc host_vars):
+# control_plane_nodes:
+#   - name: bootstrap
+#     hostname: bootstrap.example.com
+#     backup: true
+#   - name: control-plane0
+#     hostname: control-plane0.example.com
+#     backup: false
+
+# Danh sách các Compute Node
+compute_nodes: []
+# Ví dụ mẫu (hãy ghi đè trong group_vars hoặc host_vars):
+# compute_nodes:
+#   - name: compute0
+#     hostname: compute0.example.com
+#   - name: compute1
+#     hostname: compute1.example.com
+
+# Thông tin đăng nhập cho trang thống kê (nên ghi đè nếu bật enable_stats)
+stats_username: ""
+stats_password: ""

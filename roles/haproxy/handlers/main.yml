@@ -1,0 +1,17 @@
+---
+# handlers/main.yml - Các handlers cho role haproxy
+
+- name: Khởi động lại HAProxy
+  systemd:
+    name: haproxy
+    state: restarted
+
+- name: Khởi động lại Rsyslog
+  systemd:
+    name: rsyslog
+    state: restarted
+
+- name: Khởi động lại FirewallD
+  systemd:
+    name: firewalld
+    state: restarted

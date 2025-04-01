@@ -1,0 +1,66 @@
+# {{ ansible_managed }}
+# HAProxy configuration for OpenShift
+
+global
+  log         127.0.0.1 {{ haproxy_syslog_facility }}
+  pidfile     /var/run/haproxy.pid
+  maxconn     {{ haproxy_max_connections }}
+  daemon
+
+defaults
+  mode                    http
+  log                     global
+  option                  dontlognull
+  option http-server-close
+  option                  redispatch
+  retries                 3
+  timeout http-request    {{ haproxy_timeout_http_request }}
+  timeout queue           {{ haproxy_timeout_queue }}
+  timeout connect         {{ haproxy_timeout_connect }}
+  timeout client          {{ haproxy_timeout_client }}
+  timeout server          {{ haproxy_timeout_server }}
+  timeout http-keep-alive {{ haproxy_timeout_http_keep_alive }}
+  timeout check           {{ haproxy_timeout_check }}
+  maxconn                 3000
+
+listen api-server-6443
+  bind {{ haproxy_bind_api_address }}:6443
+  mode tcp
+  option  httpchk GET /readyz HTTP/1.0
+  option  log-health-checks
+  balance roundrobin
+{% for node in control_plane_nodes %}
+  server {{ node.name }} {{ node.hostname }}:6443 weight 1 verify none check check-ssl inter {{ haproxy_api_check_interval }} fall 2 rise 3{% if node.backup %} backup{% endif %}
+{% endfor %}
+
+listen machine-config-server-22623
+  bind {{ haproxy_bind_api_address }}:22623
+  mode tcp
+{% for node in control_plane_nodes %}
+  server {{ node.name }} {{ node.hostname }}:22623 check inter {{ haproxy_machine_config_check_interval }}{% if node.backup %} backup{% endif %}
+{% endfor %}
+
+listen ingress-router-443
+  bind {{ haproxy_bind_ingress_address }}:443
+  mode tcp
+  balance source
+{% for node in compute_nodes %}
+  server {{ node.name }} {{ node.hostname }}:443 check inter {{ haproxy_ingress_check_interval }}
+{% endfor %}
+
+listen ingress-router-80
+  bind {{ haproxy_bind_ingress_address }}:80
+  mode tcp
+  balance source
+{% for node in compute_nodes %}
+  server {{ node.name }} {{ node.hostname }}:80 check inter {{ haproxy_ingress_check_interval }}
+{% endfor %}
+
+{% if enable_stats is defined and enable_stats %}
+listen stats
+  bind *:{{ stats_port }}
+  stats enable
+  stats uri /
+  stats refresh 30s
+  stats auth {{ stats_username }}:{{ stats_password }}
+{% endif %}

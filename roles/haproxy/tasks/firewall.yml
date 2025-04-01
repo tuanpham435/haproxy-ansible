@@ -1,0 +1,22 @@
+---
+# tasks/firewall.yml - Cấu hình firewall cho HAProxy
+
+- name: Kiểm tra FirewallD đang chạy
+  command: systemctl status firewalld
+  register: firewalld_status
+  failed_when: false
+  changed_when: false
+
+- name: Mở port firewall cho HAProxy (FirewallD)
+  firewalld:
+    port: "{{ item }}/tcp"
+    permanent: yes
+    state: enabled
+    immediate: yes
+  loop: "{{ haproxy_firewall_ports }}"
+  when: firewalld_status.rc == 0
+
+- name: Hiển thị thông báo nếu không phát hiện firewall
+  debug:
+    msg: "CẢNH BÁO: Không phát hiện FirewallD đang chạy. Hãy đảm bảo các port {{ haproxy_firewall_ports | join(', ') }} được mở thủ công."
+  when: firewalld_status.rc != 0

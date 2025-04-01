@@ -1,0 +1,23 @@
+---
+# tasks/main.yml - Các task chính của role haproxy
+
+- name: Đảm bảo role chạy trên RHEL 8 hoặc RHEL 9
+  fail:
+    msg: "Role này chỉ hỗ trợ hệ điều hành RHEL 8 hoặc RHEL 9"
+  when: 
+    - ansible_os_family != "RedHat" 
+    - ansible_distribution_major_version is not defined or 
+      ansible_distribution_major_version not in ['8', '9']
+
+- name: Kiểm tra các biến bắt buộc
+  include_tasks: pre_check.yml
+
+- name: Include tasks cài đặt HAProxy
+  include_tasks: install.yml
+
+- name: Include tasks cấu hình HAProxy
+  include_tasks: configure.yml
+
+- name: Include tasks cấu hình firewall
+  include_tasks: firewall.yml
+  when: haproxy_manage_firewall | bool

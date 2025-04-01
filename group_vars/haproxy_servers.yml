@@ -1,0 +1,43 @@
+---
+# group_vars/haproxy_servers.yml - Biến tùy chỉnh cho HAProxy
+
+# QUAN TRỌNG: Các biến này CẦN được định nghĩa
+
+# Địa chỉ IP cho API và Machine Config Server
+haproxy_bind_api_address: "10.0.91.28"
+
+# Địa chỉ IP cho Ingress Router
+haproxy_bind_ingress_address: "10.0.91.29"
+
+# Danh sách các node Control Plane
+control_plane_nodes:
+  - name: bootstrap
+    hostname: bootstrap.ocp-ssc2.amigo.vn
+    backup: true
+  - name: control-plane0
+    hostname: control-plane0.ocp-ssc2.amigo.vn
+    backup: false
+  - name: control-plane1
+    hostname: control-plane1.ocp-ssc2.amigo.vn
+    backup: false
+  - name: control-plane2
+    hostname: control-plane2.ocp-ssc2.amigo.vn
+    backup: false
+
+# Danh sách các Compute Node
+compute_nodes:
+  - name: compute0
+    hostname: compute0.ocp-ssc2.amigo.vn
+  - name: compute1
+    hostname: compute1.ocp-ssc2.amigo.vn
+
+# Bật stats page nếu cần
+# enable_stats: true
+# stats_port: 9000
+# stats_username: admin
+# stats_password: StrongPassword123
+
+# Các biến khác có thể ghi đè nếu cần
+# haproxy_max_connections: 4000
+# haproxy_timeout_connect: 10s
+# haproxy_log_rotation_interval: weekly

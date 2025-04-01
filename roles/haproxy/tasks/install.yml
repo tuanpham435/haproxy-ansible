@@ -1,0 +1,36 @@
+---
+# tasks/install.yml - Cài đặt HAProxy và các gói cần thiết
+
+- name: Cài đặt HAProxy và các package cần thiết (RHEL 8/9)
+  dnf:
+    name: 
+      - haproxy
+    state: present
+
+- name: Tạo thư mục sao lưu
+  file:
+    path: /etc/haproxy/backup
+    state: directory
+    mode: '0755'
+
+- name: Sao lưu cấu hình HAProxy hiện tại
+  copy:
+    src: /etc/haproxy/haproxy.cfg
+    dest: "/etc/haproxy/backup/haproxy.cfg.{{ ansible_date_time.date }}"
+    remote_src: yes
+    force: no
+  ignore_errors: true
+
+- name: Kiểm tra xem file haproxy.log đã tồn tại hay chưa
+  stat:
+    path: /var/log/haproxy.log
+  register: haproxy_log_file
+
+- name: Tạo file log HAProxy nếu chưa tồn tại
+  file:
+    path: /var/log/haproxy.log
+    state: touch
+    owner: root
+    group: root
+    mode: '0644'
+  when: not haproxy_log_file.stat.exists

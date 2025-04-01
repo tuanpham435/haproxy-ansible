@@ -1,0 +1,23 @@
+---
+# meta/main.yml - Thông tin meta cho role haproxy
+
+galaxy_info:
+  role_name: haproxy
+  author: Admin Team
+  description: Triển khai HAProxy cho OpenShift
+  license: MIT
+  min_ansible_version: 2.9
+  
+  platforms:
+  - name: EL
+    versions:
+    - 8
+    - 9
+
+  galaxy_tags:
+    - haproxy
+    - openshift
+    - loadbalancer
+    - kubernetes
+
+dependencies: []

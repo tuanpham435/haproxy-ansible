@@ -1,0 +1,28 @@
+---
+# tasks/pre_check.yml - Kiểm tra trước khi triển khai
+
+- name: Kiểm tra biến bắt buộc
+  fail:
+    msg: "Biến {{ item }} là bắt buộc nhưng chưa được định nghĩa. Hãy đặt giá trị trong group_vars/haproxy_servers.yml."
+  when: (vars[item] is not defined) or (vars[item] | length == 0)
+  loop:
+    - haproxy_bind_api_address
+    - haproxy_bind_ingress_address
+
+- name: Kiểm tra danh sách control_plane_nodes
+  fail:
+    msg: "Danh sách control_plane_nodes là bắt buộc nhưng chưa được định nghĩa hoặc rỗng. Hãy đặt giá trị trong group_vars/haproxy_servers.yml."
+  when: control_plane_nodes is not defined or control_plane_nodes | length == 0
+
+- name: Kiểm tra danh sách compute_nodes
+  fail:
+    msg: "Danh sách compute_nodes là bắt buộc nhưng chưa được định nghĩa hoặc rỗng. Hãy đặt giá trị trong group_vars/haproxy_servers.yml."
+  when: compute_nodes is not defined or compute_nodes | length == 0
+
+- name: Kiểm tra thông tin đăng nhập của stats page
+  fail:
+    msg: "stats_username và stats_password là bắt buộc khi enable_stats=true. Hãy đặt giá trị trong group_vars/haproxy_servers.yml."
+  when: 
+    - enable_stats | bool
+    - (stats_username is not defined or stats_username | length == 0) or
+      (stats_password is not defined or stats_password | length == 0)

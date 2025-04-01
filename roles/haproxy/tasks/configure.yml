@@ -1,0 +1,48 @@
+---
+# tasks/configure.yml - Cấu hình HAProxy
+
+- name: Tạo file cấu hình HAProxy 
+  template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+    owner: root
+    group: root
+    mode: '0644'
+    validate: 'haproxy -c -f %s'
+  notify: Khởi động lại HAProxy
+
+- name: Cấu hình Rsyslog cho HAProxy
+  copy:
+    content: |
+      # HAProxy logging
+      {{ haproxy_syslog_facility }}.*    /var/log/haproxy.log
+    dest: /etc/rsyslog.d/haproxy.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Khởi động lại Rsyslog
+
+- name: Cấu hình log rotation cho HAProxy
+  copy:
+    content: |
+      /var/log/haproxy.log {
+          {{ haproxy_log_rotation_interval }}
+          rotate {{ haproxy_log_rotate_count }}
+          missingok
+          notifempty
+          compress
+          sharedscripts
+          postrotate
+              /bin/systemctl reload rsyslog.service > /dev/null 2>&1 || true
+          endscript
+      }
+    dest: /etc/logrotate.d/haproxy
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Đảm bảo dịch vụ HAProxy được bật và chạy
+  service:
+    name: haproxy
+    state: started
+    enabled: yes
